@@ -28,12 +28,12 @@ func NewWithNameAndLogger(name string, l *logrus.Logger) echo.MiddlewareFunc {
 			start := time.Now()
 
 			entry := l.WithFields(logrus.Fields{
-				"request": c.Request().URI(),
-				"method":  c.Request().Method(),
-				"remote":  c.Request().RemoteAddress(),
+				"request": c.Request().RequestURI,
+				"method":  c.Request().Method,
+				"remote":  c.Request().RemoteAddr,
 			})
 
-			if reqID := c.Request().Header().Get("X-Request-ID"); reqID != "" {
+			if reqID := c.Request().Header.Get("X-Request-ID"); reqID != "" {
 				entry = entry.WithField("request_id", reqID)
 			}
 
@@ -46,12 +46,12 @@ func NewWithNameAndLogger(name string, l *logrus.Logger) echo.MiddlewareFunc {
 			latency := time.Since(start)
 
 			entry = entry.WithFields(logrus.Fields{
-				"status":      c.Response().Status(),
-				"text_status": http.StatusText(c.Response().Status()),
+				"status":      c.Response().Status,
+				"text_status": http.StatusText(c.Response().Status),
 				"took":        latency,
 			})
 
-			if c.Response().Status() == http.StatusNotFound {
+			if c.Response().Status == http.StatusNotFound {
 				entry.Warn("completed handling request")
 			} else {
 				entry.Info("completed handling request")
